@@ -1,12 +1,28 @@
 
 import React from 'react';
-import { Search, User, Bell, Globe, Menu } from 'lucide-react';
+import { Search, User, Bell, Globe, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const { language, toggleLanguage, t } = useLanguage();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -14,17 +30,17 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Navigation */}
           <div className="flex items-center space-x-8 rtl:space-x-reverse">
-            <div className="flex items-center">
+            <Link to="/" className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">HF</span>
               </div>
               <span className="mr-2 ml-2 text-xl font-bold text-gray-900">Honest Finds</span>
-            </div>
+            </Link>
             
             <nav className="hidden md:flex space-x-8 rtl:space-x-reverse">
-              <a href="#" className="text-gray-900 hover:text-emerald-600 font-medium transition-colors">
+              <Link to="/" className="text-gray-900 hover:text-emerald-600 font-medium transition-colors">
                 {t('home')}
-              </a>
+              </Link>
               <a href="#" className="text-gray-600 hover:text-emerald-600 font-medium transition-colors">
                 {t('courses')}
               </a>
@@ -65,13 +81,42 @@ const Header = () => {
               <Bell className="w-4 h-4" />
             </Button>
             
-            <Button variant="ghost" size="sm">
-              <User className="w-4 h-4" />
-            </Button>
-            
-            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
-              {t('login')}
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{user.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <User className="w-4 h-4" />
+                      <span>لوحة التحكم</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center space-x-2 rtl:space-x-reverse text-red-600">
+                    <LogOut className="w-4 h-4" />
+                    <span>تسجيل الخروج</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    {t('login')}
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="outline" size="sm">
+                    إنشاء حساب
+                  </Button>
+                </Link>
+              </>
+            )}
             
             <Button variant="ghost" size="sm" className="md:hidden">
               <Menu className="w-4 h-4" />

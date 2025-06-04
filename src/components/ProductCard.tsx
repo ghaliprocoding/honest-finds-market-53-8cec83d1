@@ -1,18 +1,17 @@
 
 import React from 'react';
-import { Star, MessageSquare, Share, Bookmark, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Star, User, TrendingUp, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import TrustBadge from './TrustBadge';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProductCardProps {
   id: string;
   title: string;
   description: string;
-  price: number;
-  currency: string;
+  price?: number;
+  currency?: string;
   image: string;
   seller: string;
   category: string;
@@ -26,6 +25,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
+  id,
   title,
   description,
   price,
@@ -41,108 +41,89 @@ const ProductCard: React.FC<ProductCardProps> = ({
   isTrending,
   isFeatured
 }) => {
-  const { t } = useLanguage();
-
   return (
-    <Card className={`group hover:shadow-lg transition-all duration-300 cursor-pointer animate-fade-in ${isTrending ? 'trending-glow' : ''}`}>
-      <CardContent className="p-0">
-        {/* Image Container */}
-        <div className="relative overflow-hidden rounded-t-lg">
-          <img
-            src={image}
+    <Link to={`/products/${id}`}>
+      <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white border-0 shadow-md overflow-hidden">
+        <div className="relative">
+          <img 
+            src={image || '/placeholder.svg'} 
             alt={title}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
           
-          {/* Status Badges */}
-          <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 flex flex-col space-y-2">
+          {/* Badges */}
+          <div className="absolute top-3 right-3 flex flex-col gap-2">
             {isNew && (
-              <Badge className="bg-blue-500 text-white">
-                {t('new')}
+              <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                جديد
               </Badge>
             )}
             {isTrending && (
-              <Badge className="bg-orange-500 text-white">
-                {t('trending')}
+              <Badge className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                رائج
               </Badge>
             )}
             {isFeatured && (
-              <Badge className="bg-purple-500 text-white">
-                {t('featured')}
+              <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
+                مميز
               </Badge>
             )}
           </div>
 
-          {/* Trust Badge */}
-          <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3">
-            <TrustBadge score={trustScore} totalVotes={totalVotes} size="sm" />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="absolute bottom-3 right-3 rtl:right-auto rtl:left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="flex space-x-2 rtl:space-x-reverse">
-              <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
-                <Bookmark className="w-4 h-4" />
-              </Button>
-              <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
-                <Share className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-4">
-          {/* Category */}
-          <div className="flex items-center justify-between mb-2">
-            <Badge variant="outline" className="text-emerald-600 border-emerald-200">
-              {t(category)}
-            </Badge>
-            <div className="flex items-center space-x-1 rtl:space-x-reverse text-sm text-gray-500">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span>{rating}</span>
-              <span>({reviewCount})</span>
-            </div>
-          </div>
-
-          {/* Title */}
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
-            {title}
-          </h3>
-
-          {/* Description */}
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {description}
-          </p>
-
-          {/* Seller */}
-          <div className="flex items-center mb-3">
-            <div className="w-6 h-6 bg-gray-300 rounded-full mr-2 rtl:mr-0 rtl:ml-2"></div>
-            <span className="text-sm text-gray-600">{t('created_by')} {seller}</span>
-          </div>
-
-          {/* Price and Actions */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              <span className="text-2xl font-bold text-emerald-600">
-                {price === 0 ? t('free') : `${price} ${currency}`}
+          {/* Price */}
+          {price !== undefined && (
+            <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
+              <span className="font-bold text-lg text-gray-900">
+                {price === 0 ? 'مجاني' : `${price} ${currency}`}
               </span>
             </div>
-            
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              <Button size="sm" variant="outline" className="text-gray-600 hover:text-emerald-600">
-                <MessageSquare className="w-4 h-4 mr-1 rtl:mr-0 rtl:ml-1" />
-                {reviewCount}
-              </Button>
-              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                <ExternalLink className="w-4 h-4 mr-1 rtl:mr-0 rtl:ml-1" />
-                {t('view')}
-              </Button>
+          )}
+        </div>
+
+        <CardContent className="p-6">
+          {/* Title and Description */}
+          <div className="mb-4">
+            <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
+              {title}
+            </h3>
+            <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
+              {description}
+            </p>
+          </div>
+
+          {/* Seller */}
+          <div className="flex items-center mb-4 text-sm text-gray-600">
+            <User className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
+            <span>{seller}</span>
+          </div>
+
+          {/* Rating and Reviews */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-1 rtl:space-x-reverse">
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star 
+                    key={star} 
+                    className={`w-4 h-4 ${star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm font-medium text-gray-700">{rating}</span>
+              <span className="text-sm text-gray-500">({reviewCount})</span>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+
+          {/* Trust Badge */}
+          <TrustBadge 
+            score={trustScore} 
+            totalVotes={totalVotes}
+            size="sm"
+          />
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 

@@ -1,10 +1,10 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import CategoryFilter from '@/components/CategoryFilter';
 import ProductCard from '@/components/ProductCard';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { productsAPI } from '@/services/api';
 
 // Mock data for products/courses
 const mockProducts = [
@@ -101,14 +101,36 @@ const mockProducts = [
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [filteredProducts, setFilteredProducts] = useState(mockProducts);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await productsAPI.getAll();
+      const fetchedProducts = response.data;
+      setProducts(fetchedProducts);
+      setFilteredProducts(fetchedProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      // Fallback to mock data if backend is not available
+      setProducts(mockProducts);
+      setFilteredProducts(mockProducts);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
     if (category === 'all') {
-      setFilteredProducts(mockProducts);
+      setFilteredProducts(products);
     } else {
-      setFilteredProducts(mockProducts.filter(product => product.category === category));
+      setFilteredProducts(products.filter((product: any) => product.category === category));
     }
   };
 
@@ -135,13 +157,20 @@ const Index = () => {
               onCategoryChange={handleCategoryChange}
             />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product, index) => (
-                <div key={product.id} style={{ animationDelay: `${index * 100}ms` }}>
-                  <ProductCard {...product} />
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600 mx-auto"></div>
+                <p className="mt-4 text-lg">جارٍ التحميل...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product: any, index) => (
+                  <div key={product._id || product.id} style={{ animationDelay: `${index * 100}ms` }}>
+                    <ProductCard {...product} id={product._id || product.id} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>

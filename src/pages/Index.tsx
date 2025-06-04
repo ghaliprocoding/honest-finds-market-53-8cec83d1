@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import CategoryFilter from '@/components/CategoryFilter';
 import ProductCard from '@/components/ProductCard';
-import { LanguageProvider } from '@/contexts/LanguageContext';
 import { productsAPI } from '@/services/api';
 
 // Mock data for products/courses
@@ -135,46 +135,44 @@ const Index = () => {
   };
 
   return (
-    <LanguageProvider>
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <Hero />
-        
-        {/* Products Section */}
-        <section className="py-16 px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                اكتشف أفضل الدورات والمنتجات
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                تصفح مجموعة منتقاة من الدورات والمنتجات المُقيَّمة من قبل مجتمعنا
-              </p>
-            </div>
-            
-            <CategoryFilter 
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-            />
-            
-            {isLoading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600 mx-auto"></div>
-                <p className="mt-4 text-lg">جارٍ التحميل...</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product: any, index) => (
-                  <div key={product._id || product.id} style={{ animationDelay: `${index * 100}ms` }}>
-                    <ProductCard {...product} id={product._id || product.id} />
-                  </div>
-                ))}
-              </div>
-            )}
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <Hero />
+      
+      {/* Products Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              اكتشف أفضل الدورات والمنتجات
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              تصفح مجموعة منتقاة من الدورات والمنتجات المُقيَّمة من قبل مجتمعنا
+            </p>
           </div>
-        </section>
-      </div>
-    </LanguageProvider>
+          
+          <CategoryFilter 
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+          />
+          
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-600 mx-auto"></div>
+              <p className="mt-4 text-lg">جارٍ التحميل...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product: any, index) => (
+                <div key={product._id || product.id} style={{ animationDelay: `${index * 100}ms` }}>
+                  <ProductCard {...product} id={product._id || product.id} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
   );
 };
 
